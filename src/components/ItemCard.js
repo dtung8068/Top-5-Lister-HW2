@@ -36,10 +36,10 @@ export default class ItemCard extends React.Component {
         }
     }
     handleBlur = () => {
-        let key = this.props.keyNamePair.key;
+        let id = this.props.id;
         let textValue = this.state.text;
-        console.log("ListCard handleBlur: " + textValue);
-        this.props.renameListCallback(key, textValue);
+        console.log("ItemCard handleBlur: " + textValue);
+        this.props.renameItemCallback(id, textValue);
         this.handleToggleEdit();
     }
 
@@ -48,13 +48,14 @@ export default class ItemCard extends React.Component {
         if (this.state.editActive) {
             return (
                 <input
-                    id={"item-" + (id + 1)}
+                    id={"item-text-input-" + (id + 1)}
                     className='item-card'
                     type='text'
+                    onChange={this.handleUpdate}
                     onKeyPress={this.handleKeyPress}
                     onBlur={this.handleBlur}
-                    onChange={this.handleUpdate}
                     defaultValue={name}
+                    autoFocus
                 />)
         }
         else {
@@ -65,9 +66,9 @@ export default class ItemCard extends React.Component {
                     onClick={this.handleClick}
                     className='top5-item'>
                     <span
-                        id={"list-card-text-" + id}
+                        id={"item-card-text-" + id}
                         key={id}
-                        className="list-card-text">                                                                                
+                        className="item-card-text">                                                                                
                         {name}
                     </span>
                 </div>

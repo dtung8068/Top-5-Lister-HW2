@@ -193,7 +193,7 @@ body {
   background-color: var(--swatch-primary);
 }
 
-.item-number, .top5-item, .top5-item-dragged-to { 
+.item-number, .top5-item, .top5-item-dragged-to, .item-card { 
   display:flex;
   align-items: center;
   font-size: 24pt;
