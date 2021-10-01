@@ -24,7 +24,8 @@ class App extends React.Component {
         // SETUP THE INITIAL STATE
         this.state = {
             currentList : null,
-            sessionData : loadedSessionData
+            sessionData : loadedSessionData,
+            keyNamePair : null,
         }
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
@@ -156,23 +157,23 @@ class App extends React.Component {
             // ANY AFTER EFFECTS?
         });
     }
-    deleteList = () => {
+    deleteList = (keyNamePair) => {
         // SOMEHOW YOU ARE GOING TO HAVE TO FIGURE OUT
         // WHICH LIST IT IS THAT THE USER WANTS TO
         // DELETE AND MAKE THAT CONNECTION SO THAT THE
         // NAME PROPERLY DISPLAYS INSIDE THE MODAL
-        this.showDeleteListModal();
+        this.setState({
+            keyNamePair: keyNamePair
+        })
     }
-    // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
-    // TO SEE IF THEY REALLY WANT TO DELETE THE LIST
-    showDeleteListModal() {
-        let modal = document.getElementById("delete-modal");
-        modal.classList.add("is-visible");
+    removeList = (keyNamePair) => {
+        console.log("Deleting:");
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
     hideDeleteListModal() {
-        let modal = document.getElementById("delete-modal");
-        modal.classList.remove("is-visible");
+        this.setState({
+            keyNamePair: null
+        })
     }
     render() {
         return (
@@ -185,8 +186,8 @@ class App extends React.Component {
                     currentList={this.state.currentList}
                     keyNamePairs={this.state.sessionData.keyNamePairs}
                     createNewListCallback={this.createNewList}
-                    deleteListCallback={this.deleteList}
                     loadListCallback={this.loadList}
+                    deleteListCallback={this.deleteList}
                     renameListCallback={this.renameList}
                 />
                 <Workspace
@@ -197,6 +198,8 @@ class App extends React.Component {
                     currentList={this.state.currentList} />
                 <DeleteModal
                     hideDeleteListModalCallback={this.hideDeleteListModal}
+                    deleteListCallback={this.removeList}
+                    keyNamePair = {this.state.keyNamePair}
                 />
             </div>
         );

@@ -70,6 +70,10 @@ export default class ItemCard extends React.Component {
         console.log("ItemCard handleBlur: " + textValue);
         this.props.renameItemCallback(id, textValue);
         this.handleToggleEdit();
+        this.setState({
+            text: this.props.name,
+            id: this.props.id,
+        })
     }
 
     render() {
