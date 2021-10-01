@@ -115,6 +115,24 @@ class App extends React.Component {
         this.setState({currentList: newCurrentList})
         //Transaction Stuff here. 
     }
+    moveItem = (oldIndex, newIndex) => {
+        let newCurrentList = this.state.currentList;
+        let temp = newCurrentList.items[newIndex];
+        newCurrentList.items[newIndex] = newCurrentList.items[oldIndex];
+        if(oldIndex < newIndex) {
+            for(let i = oldIndex; i < newIndex - 1; i++) {
+                newCurrentList.items[i] = newCurrentList.items[i+1];
+            }
+            newCurrentList.items[newIndex - 1] = temp;
+        }
+        else {
+            for(let i = oldIndex; i > newIndex + 1; i--) {
+                newCurrentList.items[i] = newCurrentList.items[i-1];
+            }
+            newCurrentList.items[newIndex + 1] = temp;
+        }
+        this.setState({currentList: newCurrentList})
+    }
     
     
     // THIS FUNCTION BEGINS THE PROCESS OF LOADING A LIST FOR EDITING
@@ -173,7 +191,8 @@ class App extends React.Component {
                 />
                 <Workspace
                     currentList={this.state.currentList}
-                    renameItemCallback={this.renameItem} />
+                    renameItemCallback={this.renameItem}
+                    moveItemCallback={this.moveItem} />
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteModal

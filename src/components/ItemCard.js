@@ -10,6 +10,20 @@ export default class ItemCard extends React.Component {
             editActive: false,
         }
     }
+    handleDragStart = (event) => {
+        event.dataTransfer.setData("text", this.state.id);
+    }
+    handleDragOver = (event) => {
+        event.preventDefault();
+    }
+    handleDragDrop = (event) => {
+        event.preventDefault();
+        let oldIndex = parseInt(event.dataTransfer.getData("text"));
+        let newIndex = this.state.id;
+        if (oldIndex !== newIndex) {
+            this.props.moveItemCallback(oldIndex, newIndex);
+        }
+    }
     handleClick = (event) => {
         if (event.detail === 2) {
             this.handleToggleEdit(event);
@@ -63,6 +77,10 @@ export default class ItemCard extends React.Component {
                 <div
                     id={'item-' + (id + 1)}
                     key={id}
+                    draggable = "true"
+                    onDragStart={this.handleDragStart}
+                    onDragOver={this.handleDragOver}
+                    onDrop={this.handleDragDrop}
                     onClick={this.handleClick}
                     className='top5-item'>
                     <span
