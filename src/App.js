@@ -27,6 +27,7 @@ class App extends React.Component {
             sessionData : loadedSessionData,
             keyNamePair : null,
         }
+        this.hideDeleteListModal = this.hideDeleteListModal.bind(this)
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
         keyNamePairs.sort((keyPair1, keyPair2) => {
@@ -44,7 +45,7 @@ class App extends React.Component {
         let newList = {
             key: newKey,
             name: newName,
-            items: ["?", "?", "?", "?", "?"]
+            items: ["?1", "?2", "?3", "?4", "?5"]
         };
 
         // MAKE THE KEY,NAME OBJECT SO WE CAN KEEP IT IN OUR
@@ -166,8 +167,24 @@ class App extends React.Component {
             keyNamePair: keyNamePair
         })
     }
-    removeList = (keyNamePair) => {
-        console.log("Deleting:");
+    removeList = () => {
+        let newKeyNamePairs = [...this.state.sessionData.keyNamePairs];
+        let index = 0;
+        for(let i = 0; i < newKeyNamePairs.length; i++) {
+            if(newKeyNamePairs[i].key === this.state.keyNamePair.key) {
+                index = i;
+            }
+        }
+        newKeyNamePairs.splice(index, 1);
+        this.sortKeyNamePairsByName(newKeyNamePairs);
+        this.setState({
+            currentList: null,
+            keyNamePair: null, 
+            sessionData: {
+                keyNamePairs: newKeyNamePairs
+            }
+            
+        })
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
     hideDeleteListModal() {
