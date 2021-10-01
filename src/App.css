@@ -200,6 +200,14 @@ body {
   height:20%;
 }
 
+.highlight {
+  background-color: green;
+  display:flex;
+  align-items: center;
+  font-size: 24pt;
+  height:20%;
+}
+
 .item-number {
   justify-content: center;
   width:100%;

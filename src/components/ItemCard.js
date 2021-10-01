@@ -8,6 +8,7 @@ export default class ItemCard extends React.Component {
             text: this.props.name,
             id: this.props.id,
             editActive: false,
+            hoverActive: false,
         }
     }
     handleDragStart = (event) => {
@@ -15,6 +16,15 @@ export default class ItemCard extends React.Component {
     }
     handleDragOver = (event) => {
         event.preventDefault();
+        this.setState({
+            hoverActive: true
+        })
+    }
+    handleDragLeave = (event) => {
+        event.preventDefault();
+        this.setState({
+            hoverActive: false
+        })
     }
     handleDragDrop = (event) => {
         event.preventDefault();
@@ -23,6 +33,11 @@ export default class ItemCard extends React.Component {
         if (oldIndex !== newIndex) {
             this.props.moveItemCallback(oldIndex, newIndex);
         }
+        this.setState({
+            text: this.props.name,
+            id: this.props.id,
+            hoverActive: false
+        })
     }
     handleClick = (event) => {
         if (event.detail === 2) {
@@ -63,7 +78,7 @@ export default class ItemCard extends React.Component {
             return (
                 <input
                     id={"item-text-input-" + (id + 1)}
-                    className='item-card'
+                    className= {'item-card'}
                     type='text'
                     onChange={this.handleUpdate}
                     onKeyPress={this.handleKeyPress}
@@ -71,6 +86,27 @@ export default class ItemCard extends React.Component {
                     defaultValue={name}
                     autoFocus
                 />)
+        }
+        else if (this.state.hoverActive) {
+            return (
+                <div
+                    id={'item-' + (id + 1)}
+                    key={id}
+                    draggable = "true"
+                    onDragStart={this.handleDragStart}
+                    onDragOver={this.handleDragOver}
+                    onDragLeave={this.handleDragLeave}
+                    onDrop={this.handleDragDrop}
+                    onClick={this.handleClick}
+                    className={'highlight'}>
+                    <span
+                        id={"item-card-text-" + id}
+                        key={id}
+                        className="item-card-text">                                                                                
+                        {name}
+                    </span>
+                </div>
+            );
         }
         else {
             return (
@@ -80,9 +116,10 @@ export default class ItemCard extends React.Component {
                     draggable = "true"
                     onDragStart={this.handleDragStart}
                     onDragOver={this.handleDragOver}
+                    onDragLeave={this.handleDragLeave}
                     onDrop={this.handleDragDrop}
                     onClick={this.handleClick}
-                    className='top5-item'>
+                    className={'top5-item'}>
                     <span
                         id={"item-card-text-" + id}
                         key={id}
