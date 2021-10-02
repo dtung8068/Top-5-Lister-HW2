@@ -1,5 +1,8 @@
 import React from 'react';
 import './App.css';
+import jsTPS from "./components/jsTPS.js";
+import ChangeItem_Transaction from "./components/ChangeItem_Transaction.js";
+import MoveItem_Transaction from "./components/MoveItem_Transaction.js";
 
 // IMPORT DATA MANAGEMENT AND TRANSACTION STUFF
 import DBManager from './db/DBManager';
