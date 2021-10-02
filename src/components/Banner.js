@@ -3,7 +3,7 @@ import React from "react";
 
 export default class Banner extends React.Component {
     render() {
-        const { title, undoCallback, redoCallback} = this.props;
+        const { title, closeCallback, undoCallback, redoCallback} = this.props;
         return (
             <div id="top5-banner">
                 {title}
@@ -22,7 +22,8 @@ export default class Banner extends React.Component {
                 </div>
                 <div
                     id='close-button'
-                    className="top5-button">
+                    className="top5-button"
+                    onClick={closeCallback}>
                         &#x24E7;
                 </div>
             </div>
