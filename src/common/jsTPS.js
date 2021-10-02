@@ -1,3 +1,5 @@
+'use strict'
+
 /**
  * jsTPS_Transaction
  * 
@@ -189,7 +191,7 @@ export default class jsTPS {
      */
     clearAllTransactions() {
         // REMOVE ALL THE TRANSACTIONS
-        this.transactions = [];
+        this.transactions = new Array();
         
         // MAKE SURE TO RESET THE LOCATION OF THE
         // TOP OF THE TPS STACK TOO

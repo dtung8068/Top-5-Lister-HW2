@@ -1,8 +1,8 @@
 import React from 'react';
 import './App.css';
-//import jsTPS from "./components/jsTPS.js";
-//import ChangeItem_Transaction from "./components/ChangeItem_Transaction.js";
-//import MoveItem_Transaction from "./components/MoveItem_Transaction.js";
+import jsTPS from "./common/jsTPS.js";
+import ChangeItem_Transaction from "./components/ChangeItem_Transaction.js";
+import MoveItem_Transaction from "./components/MoveItem_Transaction.js";
 
 // IMPORT DATA MANAGEMENT AND TRANSACTION STUFF
 import DBManager from './db/DBManager';
@@ -17,20 +17,21 @@ import Statusbar from './components/Statusbar.js'
 class App extends React.Component {
     constructor(props) {
         super(props);
-
         // THIS WILL TALK TO LOCAL STORAGE
         this.db = new DBManager();
+        this.tps = new jsTPS();
 
         // GET THE SESSION DATA FROM OUR DATA MANAGER
         let loadedSessionData = this.db.queryGetSessionData();
-
         // SETUP THE INITIAL STATE
         this.state = {
             currentList : null,
             sessionData : loadedSessionData,
             keyNamePair : null,
         }
-        this.hideDeleteListModal = this.hideDeleteListModal.bind(this)
+        this.hideDeleteListModal = this.hideDeleteListModal.bind(this);
+        this.undo = this.undo.bind(this);
+        this.redo = this.redo.bind(this);
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
         keyNamePairs.sort((keyPair1, keyPair2) => {
@@ -112,13 +113,14 @@ class App extends React.Component {
     renameItem = (id, newName) => {
         let newCurrentList = this.state.currentList;
         // NOW GO THROUGH THE ARRAY AND FIND THE ONE TO RENAME
-        for (let i = 0; i < newCurrentList.items.length; i++) {
-            if (i === id) {
-                newCurrentList.items[i] = newName
-            }
-        }
+        newCurrentList.items[id] = newName;
         this.setState({currentList: newCurrentList})
         //Transaction Stuff here. 
+    }
+    addRenameItemTransaction = (id, newName) => {
+        let oldName = this.state.currentList.items[id];
+        let transaction = new ChangeItem_Transaction(this, id, oldName, newName);
+        this.tps.addTransaction(transaction);
     }
     moveItem = (oldIndex, newIndex) => {
         let newCurrentList = this.state.currentList;
@@ -138,12 +140,15 @@ class App extends React.Component {
         }
         this.setState({currentList: newCurrentList})
     }
-    
+    addMoveItemTransaction = (oldIndex, newIndex) => {
+        let transaction = new MoveItem_Transaction(this, oldIndex, newIndex);
+        this.tps.addTransaction(transaction);
+    }
     
     // THIS FUNCTION BEGINS THE PROCESS OF LOADING A LIST FOR EDITING
     loadList = (key) => {
         let newCurrentList = this.db.queryGetList(key);
-        
+        this.tps.clearAllTransactions();
         this.setState(prevState => ({
             currentList: newCurrentList,
             sessionData: prevState.sessionData
@@ -153,6 +158,7 @@ class App extends React.Component {
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
     closeCurrentList = () => {
+        this.tps.clearAllTransactions();
         this.setState(prevState => ({
             currentList: null,
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
@@ -180,6 +186,7 @@ class App extends React.Component {
         }
         newKeyNamePairs.splice(index, 1);
         this.sortKeyNamePairsByName(newKeyNamePairs);
+        this.tps.clearAllTransactions();
         this.setState({
             currentList: null,
             keyNamePair: null, 
@@ -188,6 +195,7 @@ class App extends React.Component {
             }
             
         })
+
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
     hideDeleteListModal() {
@@ -195,12 +203,36 @@ class App extends React.Component {
             keyNamePair: null
         })
     }
+    undo() {
+        if (this.tps.hasTransactionToUndo()) {
+            this.tps.undoTransaction();
+        }
+    }
+    redo() {
+        if(this.tps.hasTransactionToRedo()) {
+            this.tps.doTransaction();
+        }
+    }
+    handleKeyPress = (event) => {
+        if(event.ctrlKey && event.key === 'z') {
+            this.undo();
+        }
+        else if(event.ctrlKey && event.key=== 'y') {
+            this.redo();
+        }
+    }
+    componentDidMount() {
+        document.addEventListener('keydown', this.handleKeyPress, false);
+    }
+
     render() {
         return (
             <div id="app-root">
                 <Banner 
                     title='Top 5 Lister'
-                    closeCallback={this.closeCurrentList} />
+                    closeCallback={this.closeCurrentList} 
+                    undoCallback={this.undo}
+                    redoCallback={this.redo}/>
                 <Sidebar
                     heading='Your Lists'
                     currentList={this.state.currentList}
@@ -212,8 +244,8 @@ class App extends React.Component {
                 />
                 <Workspace
                     currentList={this.state.currentList}
-                    renameItemCallback={this.renameItem}
-                    moveItemCallback={this.moveItem} />
+                    renameItemCallback={this.addRenameItemTransaction}
+                    moveItemCallback={this.addMoveItemTransaction} />
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteModal
