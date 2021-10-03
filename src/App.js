@@ -75,7 +75,9 @@ class App extends React.Component {
             // PUTTING THIS NEW LIST IN PERMANENT STORAGE
             // IS AN AFTER EFFECT
             this.db.mutationCreateList(newList);
+            this.db.mutationUpdateSessionData(this.state.sessionData);
         });
+        
     }
     renameList = (key, newName) => {
         let newKeyNamePairs = [...this.state.sessionData.keyNamePairs];
@@ -115,7 +117,7 @@ class App extends React.Component {
         // NOW GO THROUGH THE ARRAY AND FIND THE ONE TO RENAME
         newCurrentList.items[id] = newName;
         this.setState({currentList: newCurrentList})
-        //Transaction Stuff here. 
+        this.db.mutationUpdateList(newCurrentList);
     }
     addRenameItemTransaction = (id, newName) => {
         let oldName = this.state.currentList.items[id];
@@ -139,6 +141,7 @@ class App extends React.Component {
             newCurrentList.items[newIndex + 1] = temp;
         }
         this.setState({currentList: newCurrentList})
+        this.db.mutationUpdateList(newCurrentList);
     }
     addMoveItemTransaction = (oldIndex, newIndex) => {
         let transaction = new MoveItem_Transaction(this, oldIndex, newIndex);
@@ -187,15 +190,22 @@ class App extends React.Component {
         newKeyNamePairs.splice(index, 1);
         this.sortKeyNamePairsByName(newKeyNamePairs);
         this.tps.clearAllTransactions();
-        this.setState({
+        let list = this.db.queryGetList(index);
+        this.setState(prevState => ({
             currentList: null,
             keyNamePair: null, 
             sessionData: {
-                keyNamePairs: newKeyNamePairs
+                nextKey: prevState.sessionData.nextKey,
+                counter: prevState.sessionData.counter - 1,
+                keyNamePairs: newKeyNamePairs,
             }
             
-        })
-
+        }), () => {
+            // PUTTING THIS NEW LIST IN PERMANENT STORAGE
+            // IS AN AFTER EFFECT
+            this.db.mutationDeleteList(list);
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+        });
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
     hideDeleteListModal() {
