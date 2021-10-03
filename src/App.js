@@ -28,6 +28,8 @@ class App extends React.Component {
             currentList : null,
             sessionData : loadedSessionData,
             keyNamePair : null,
+            hasUndo: this.tps.hasTransactionToUndo(),
+            hasRedo: this.tps.hasTransactionToRedo(),
         }
         this.hideDeleteListModal = this.hideDeleteListModal.bind(this);
         this.undo = this.undo.bind(this);
@@ -116,7 +118,9 @@ class App extends React.Component {
         let newCurrentList = this.state.currentList;
         // NOW GO THROUGH THE ARRAY AND FIND THE ONE TO RENAME
         newCurrentList.items[id] = newName;
-        this.setState({currentList: newCurrentList})
+        this.setState({currentList: newCurrentList, 
+            hasRedo: this.tps.hasTransactionToRedo(),
+            hasUndo: this.tps.hasTransactionToUndo(),})
         this.db.mutationUpdateList(newCurrentList);
     }
     addRenameItemTransaction = (id, newName) => {
@@ -140,7 +144,9 @@ class App extends React.Component {
             }
             newCurrentList.items[newIndex + 1] = temp;
         }
-        this.setState({currentList: newCurrentList})
+        this.setState({currentList: newCurrentList,
+            hasRedo: this.tps.hasTransactionToRedo(),
+            hasUndo: this.tps.hasTransactionToUndo(),})
         this.db.mutationUpdateList(newCurrentList);
     }
     addMoveItemTransaction = (oldIndex, newIndex) => {
@@ -164,6 +170,8 @@ class App extends React.Component {
         this.tps.clearAllTransactions();
         this.setState(prevState => ({
             currentList: null,
+            hasRedo: this.tps.hasTransactionToRedo(),
+            hasUndo: this.tps.hasTransactionToUndo(),
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             sessionData: this.state.sessionData
         }), () => {
@@ -195,7 +203,7 @@ class App extends React.Component {
             currentList: null,
             keyNamePair: null, 
             sessionData: {
-                nextKey: prevState.sessionData.nextKey,
+                nextKey: prevState.sessionData.nextKey - 1,
                 counter: prevState.sessionData.counter - 1,
                 keyNamePairs: newKeyNamePairs,
             }
@@ -216,11 +224,19 @@ class App extends React.Component {
     undo() {
         if (this.tps.hasTransactionToUndo()) {
             this.tps.undoTransaction();
+            this.setState({
+                hasRedo: this.tps.hasTransactionToRedo(),
+                hasUndo: this.tps.hasTransactionToUndo(),
+            })
         }
     }
     redo() {
         if(this.tps.hasTransactionToRedo()) {
             this.tps.doTransaction();
+            this.setState({
+                hasRedo: this.tps.hasTransactionToRedo(),
+                hasUndo: this.tps.hasTransactionToUndo(),
+            })
         }
     }
     handleKeyPress = (event) => {
@@ -242,7 +258,10 @@ class App extends React.Component {
                     title='Top 5 Lister'
                     closeCallback={this.closeCurrentList} 
                     undoCallback={this.undo}
-                    redoCallback={this.redo}/>
+                    redoCallback={this.redo}
+                    hasRedo={this.state.hasRedo}
+                    hasUndo={this.state.hasUndo}
+                    currentList={this.state.currentList}/>
                 <Sidebar
                     heading='Your Lists'
                     currentList={this.state.currentList}
