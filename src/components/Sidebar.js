@@ -10,15 +10,12 @@ export default class Sidebar extends React.Component {
                 deleteListCallback, 
                 loadListCallback,
                 renameListCallback} = this.props;
+        let addListButton = currentList ? <input type="button" id="add-list-button" onClick={createNewListCallback} className="top5-button-disabled" value="+" />:
+        <input type="button" id="add-list-button" onClick={createNewListCallback} className="top5-button" value="+" />
         return (
             <div id="top5-sidebar">
                 <div id="sidebar-heading">
-                    <input 
-                        type="button" 
-                        id="add-list-button" 
-                        onClick={createNewListCallback}
-                        className="top5-button" 
-                        value="+" />
+                    {addListButton}
                     {heading}
                 </div>
                 <div id="sidebar-list">
