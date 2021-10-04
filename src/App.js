@@ -191,6 +191,7 @@ class App extends React.Component {
     removeList = () => {
         let newKeyNamePairs = [...this.state.sessionData.keyNamePairs];
         let index = 0;
+        let key = this.state.keyNamePair.key;
         for(let i = 0; i < newKeyNamePairs.length; i++) {
             if(newKeyNamePairs[i].key === this.state.keyNamePair.key) {
                 index = i;
@@ -199,10 +200,12 @@ class App extends React.Component {
         newKeyNamePairs.splice(index, 1);
         this.sortKeyNamePairsByName(newKeyNamePairs);
         this.tps.clearAllTransactions();
-        let list = this.db.queryGetList(index);
+        let list = this.db.queryGetList(key);
         this.setState(prevState => ({
             currentList: null,
             keyNamePair: null, 
+            hasRedo: this.tps.hasTransactionToRedo(),
+            hasUndo: this.tps.hasTransactionToUndo(),
             sessionData: {
                 nextKey: prevState.sessionData.nextKey - 1,
                 counter: prevState.sessionData.counter - 1,
