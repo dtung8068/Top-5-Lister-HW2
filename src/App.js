@@ -1,4 +1,5 @@
 import React from 'react';
+import './fonts/LexendExa/css.css';
 import './App.css';
 import jsTPS from "./common/jsTPS.js";
 import ChangeItem_Transaction from "./components/ChangeItem_Transaction.js";
