@@ -52,7 +52,7 @@ class App extends React.Component {
         let newList = {
             key: newKey,
             name: newName,
-            items: ["?1", "?2", "?3", "?4", "?5"]
+            items: ["?", "?", "?", "?", "?"]
         };
 
         // MAKE THE KEY,NAME OBJECT SO WE CAN KEEP IT IN OUR

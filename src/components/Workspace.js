@@ -3,6 +3,7 @@ import ItemCard from "./ItemCard";
 
 export default class Workspace extends React.Component {
     render() {
+        let i = 0;
         const {currentList, renameItemCallback, moveItemCallback} = this.props;
         if(currentList) {
             return (
@@ -19,8 +20,8 @@ export default class Workspace extends React.Component {
                             {
                                 currentList.items.map((pair) => (
                                     <ItemCard
-                                    key={currentList.items.indexOf(pair)}
-                                    id={currentList.items.indexOf(pair)}
+                                    key={i++}
+                                    id={i}
                                     name={pair}
                                     renameItemCallback={renameItemCallback}
                                     moveItemCallback={moveItemCallback}
